@@ -72,8 +72,8 @@ def log_with_color(message,
         'debug': '[DEBUG] '
     }
 
-    # Construct the formatted message
-    formatted_message = f"{text_color_code}{background_color_code}{level_prefixes[level]}{message}{Style.RESET_ALL}"
+    # Construct the formatted message without autoreset
+    formatted_message = f"{text_color_code}{background_color_code}{level_prefixes[level]}{message}"
 
     # Write to the specified file
     print(formatted_message, file=file, flush=True)
