@@ -1,18 +1,21 @@
 import os
+import tempfile
 import pytest
 import logging
 from src.timestamped_logger import log_with_timestamp
 
-def test_log_with_timestamp_default():
+@pytest.fixture
+def temp_log_dir():
+    """Create a temporary directory for log files"""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        yield tmpdir
+
+def test_log_with_timestamp_default(temp_log_dir):
     """Test default logging functionality"""
-    log_file = os.path.join(os.getcwd(), 'default.log')
-    
-    # Ensure clean test environment
-    if os.path.exists(log_file):
-        os.remove(log_file)
+    log_file = os.path.join(temp_log_dir, 'default.log')
     
     # Log a message
-    result = log_with_timestamp("Test default log")
+    result = log_with_timestamp("Test default log", log_file=log_file)
     
     # Check return value
     assert result is True
@@ -23,16 +26,12 @@ def test_log_with_timestamp_default():
         assert "Test default log" in log_content
         assert "INFO" in log_content
 
-def test_log_with_timestamp_different_levels():
+def test_log_with_timestamp_different_levels(temp_log_dir):
     """Test logging with different log levels"""
     levels = ['DEBUG', 'WARNING', 'ERROR', 'CRITICAL']
     
     for level in levels:
-        log_file = os.path.join(os.getcwd(), f'test_{level.lower()}.log')
-        
-        # Ensure clean test environment
-        if os.path.exists(log_file):
-            os.remove(log_file)
+        log_file = os.path.join(temp_log_dir, f'test_{level.lower()}.log')
         
         # Log a message with specific level
         result = log_with_timestamp(f"Test {level} log", log_level=level, log_file=log_file)
@@ -51,13 +50,9 @@ def test_log_invalid_level():
     with pytest.raises(ValueError, match="Invalid log level"):
         log_with_timestamp("Test invalid log", log_level="INVALID")
 
-def test_log_custom_file():
+def test_log_custom_file(temp_log_dir):
     """Test logging to a custom file in a subdirectory"""
-    log_file = os.path.join(os.getcwd(), 'logs', 'custom_log.log')
-    
-    # Ensure clean test environment
-    if os.path.exists(log_file):
-        os.remove(log_file)
+    log_file = os.path.join(temp_log_dir, 'logs', 'custom_log.log')
     
     # Ensure directory exists
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
