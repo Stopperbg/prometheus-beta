@@ -19,6 +19,11 @@ def log_with_timestamp(message, log_level='INFO', log_file=None):
     Returns:
         bool: True if logging was successful
     """
+    # Validate log level first
+    valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+    if log_level.upper() not in valid_levels:
+        raise ValueError(f"Invalid log level: {log_level}. Must be one of: {', '.join(valid_levels)}")
+    
     # Determine log file path
     if log_file is None:
         log_file = os.path.join(tempfile.gettempdir(), 'default.log')
@@ -28,7 +33,7 @@ def log_with_timestamp(message, log_level='INFO', log_file=None):
     
     # Create a logger
     logger = logging.getLogger(log_file)
-    logger.setLevel(logging.getLevelName(log_level.upper()))
+    logger.setLevel(getattr(logging, log_level.upper()))
     
     # Create file handler
     file_handler = logging.FileHandler(log_file)
@@ -47,11 +52,7 @@ def log_with_timestamp(message, log_level='INFO', log_file=None):
         'WARNING': logger.warning,
         'ERROR': logger.error,
         'CRITICAL': logger.critical
-    }.get(log_level.upper())
-    
-    # Validate log level
-    if not log_method:
-        raise ValueError(f"Invalid log level: {log_level}. Must be one of: DEBUG, INFO, WARNING, ERROR, CRITICAL")
+    }[log_level.upper()]
     
     # Log the message
     log_method(message)
