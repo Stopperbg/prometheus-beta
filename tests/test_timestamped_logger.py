@@ -5,7 +5,7 @@ from src.timestamped_logger import log_with_timestamp
 
 def test_log_with_timestamp_default():
     """Test default logging functionality"""
-    log_file = 'test_default.log'
+    log_file = os.path.join(os.getcwd(), 'default.log')
     
     # Ensure clean test environment
     if os.path.exists(log_file):
@@ -28,7 +28,7 @@ def test_log_with_timestamp_different_levels():
     levels = ['DEBUG', 'WARNING', 'ERROR', 'CRITICAL']
     
     for level in levels:
-        log_file = f'test_{level.lower()}.log'
+        log_file = os.path.join(os.getcwd(), f'test_{level.lower()}.log')
         
         # Ensure clean test environment
         if os.path.exists(log_file):
@@ -53,14 +53,14 @@ def test_log_invalid_level():
 
 def test_log_custom_file():
     """Test logging to a custom file in a subdirectory"""
-    log_file = 'logs/custom_log.log'
+    log_file = os.path.join(os.getcwd(), 'logs', 'custom_log.log')
     
     # Ensure clean test environment
     if os.path.exists(log_file):
         os.remove(log_file)
     
     # Ensure directory exists
-    os.makedirs('logs', exist_ok=True)
+    os.makedirs(os.path.dirname(log_file), exist_ok=True)
     
     # Log a message to custom file
     result = log_with_timestamp("Test custom log file", log_file=log_file)
