@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import tempfile
 
 def log_with_timestamp(message, log_level='INFO', log_file=None):
     """
