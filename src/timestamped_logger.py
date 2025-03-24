@@ -15,8 +15,11 @@ def log_with_timestamp(message, log_level='INFO', log_file='app.log'):
     Raises:
         ValueError: If an invalid log level is provided
         IOError: If there are issues creating or writing to the log file
+    
+    Returns:
+        bool: True if logging was successful
     """
-    # Ensure the logs directory exists
+    # Create the directory for the log file if it doesn't exist
     os.makedirs(os.path.dirname(log_file) or '.', exist_ok=True)
     
     # Configure logging
@@ -27,6 +30,17 @@ def log_with_timestamp(message, log_level='INFO', log_file='app.log'):
         filename=log_file,
         filemode='a'
     )
+    
+    # Create a file handler explicitly to ensure the file is created
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    ))
+    
+    # Get the root logger and add the file handler
+    root_logger = logging.getLogger()
+    root_logger.addHandler(file_handler)
     
     # Get the appropriate logging method based on log level
     log_method = {
@@ -43,5 +57,9 @@ def log_with_timestamp(message, log_level='INFO', log_file='app.log'):
     
     # Log the message
     log_method(message)
+    
+    # Close and remove the handler to prevent duplicate log entries in future calls
+    file_handler.close()
+    root_logger.removeHandler(file_handler)
     
     return True  # Indicates successful logging
