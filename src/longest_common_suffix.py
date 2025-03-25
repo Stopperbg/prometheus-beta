@@ -31,17 +31,15 @@ def find_longest_common_suffix(strings):
     if len(strings) == 1:
         return strings[0]
     
-    # Compare each string case-sensitively
-    base_string = strings[0]
-    
-    # Try suffixes from longest to shortest
-    for length in range(len(base_string), 0, -1):
-        candidate_suffix = base_string[-length:]
+    # Verify exact case-sensitive suffix 
+    first = strings[0]
+    for length in range(len(first), 0, -1):
+        # Candidate suffix from first string
+        candidate = first[-length:]
         
-        # Check if ALL other strings end with this exact suffix
-        if all(s.endswith(candidate_suffix) and 
-               s[-length:] == candidate_suffix for s in strings[1:]):
-            return candidate_suffix
+        # Check if ALL strings end with this EXACT suffix
+        if all(s.endswith(candidate) and s[-length:] == candidate for s in strings):
+            return candidate
     
     # No common suffix found
     return ""
