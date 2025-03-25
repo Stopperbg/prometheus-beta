@@ -39,8 +39,9 @@ def find_longest_common_suffix(strings):
         # Candidate suffix from the shortest string
         candidate_suffix = shortest[-length:]
         
-        # Check if ALL strings match this EXACT suffix
-        if len(set(s[-length:] for s in strings)) == 1:
+        # Explicitly check for case-sensitivity
+        suffixes = [s[-length:] for s in strings]
+        if len(set(suffixes)) == 1:
             return candidate_suffix
     
     # No common suffix found
