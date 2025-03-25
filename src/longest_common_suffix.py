@@ -38,8 +38,8 @@ def find_longest_common_suffix(strings):
     for length in range(len(shortest), 0, -1):
         candidate_suffix = shortest[-length:]
         
-        # Check if this full suffix matches exactly (case-sensitive) 
-        # for all strings
+        # Check if the candidate suffix is case-sensitively the same 
+        # for ALL strings
         if all(s[-length:] == candidate_suffix for s in strings):
             return candidate_suffix
     
