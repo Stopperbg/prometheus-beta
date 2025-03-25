@@ -21,6 +21,6 @@ def find_smallest_sum(list1, list2):
         raise ValueError("Lists cannot be empty")
     
     # Find the smallest possible sum by comparing all combinations
-    smallest_sum = sum(sorted([min(list1), min(list2)]))
+    smallest_sum = min(x + y for x in list1 for y in list2)
     
     return smallest_sum
