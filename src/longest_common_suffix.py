@@ -30,10 +30,6 @@ def find_longest_common_suffix(strings):
     if len(strings) == 1:
         return strings[0]
     
-    # Case-sensitive suffix matching
-    def suffix_match(length):
-        return all(s.endswith(s[-length:]) for s in strings)
-    
     # Find the shortest string to limit suffix length
     shortest = min(strings, key=len)
     
@@ -42,8 +38,10 @@ def find_longest_common_suffix(strings):
         candidate_suffix = shortest[-length:]
         
         # Check if this full suffix is common to all strings
-        if suffix_match(length):
-            return candidate_suffix
+        if all(s.endswith(candidate_suffix) for s in strings):
+            # Verify case-sensitivity and exact suffix match
+            if all(s[-length:] == candidate_suffix for s in strings):
+                return candidate_suffix
     
     # No common suffix found
     return ""
