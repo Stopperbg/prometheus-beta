@@ -10,6 +10,7 @@ def find_longest_common_suffix(strings):
              - The input list is empty
              - No common suffix exists
              - Input is not a list of strings
+             - No case-sensitive common suffix exists
 
     Raises:
         TypeError: If input is not a list
@@ -37,11 +38,10 @@ def find_longest_common_suffix(strings):
     for length in range(len(shortest), 0, -1):
         candidate_suffix = shortest[-length:]
         
-        # Check if this full suffix is common to all strings
-        if all(s.endswith(candidate_suffix) for s in strings):
-            # Verify case-sensitivity and exact suffix match
-            if all(s[-length:] == candidate_suffix for s in strings):
-                return candidate_suffix
+        # Check if this full suffix matches exactly (case-sensitive) 
+        # for all strings
+        if all(s[-length:] == candidate_suffix for s in strings):
+            return candidate_suffix
     
     # No common suffix found
     return ""
