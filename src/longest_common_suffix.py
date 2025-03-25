@@ -31,6 +31,13 @@ def find_longest_common_suffix(strings):
     if len(strings) == 1:
         return strings[0]
     
+    # Explicitly check case sensitivity for each string
+    strings_identical_case = strings[0]
+    for test_string in strings[1:]:
+        # If case of ANY character differs, return empty string
+        if any(a != b for a, b in zip(strings_identical_case, test_string)):
+            return ""
+    
     # Find the shortest string to limit suffix length
     shortest = min(strings, key=len)
     
@@ -39,15 +46,9 @@ def find_longest_common_suffix(strings):
         # Candidate suffix from the shortest string
         candidate_suffix = shortest[-length:]
         
-        # Check if strings match the exact suffix with case sensitivity
-        suffixes = [s[-length:] for s in strings]
-        
-        # Require that ALL suffixes are identical 
-        # AND have the same exact case
-        if len(set(suffixes)) == 1:
-            # Ensure EVERY string ends with this EXACT case-sensitive suffix
-            if all(s.endswith(candidate_suffix) for s in strings):
-                return candidate_suffix
+        # Check if ALL strings match this suffix with the EXACT SAME CASE
+        if all(s.endswith(candidate_suffix) for s in strings):
+            return candidate_suffix
     
     # No common suffix found
     return ""
