@@ -31,19 +31,26 @@ def find_longest_common_suffix(strings):
     if len(strings) == 1:
         return strings[0]
     
-    # Verify exact case-sensitive suffix 
+    # Check if all strings have identical case for each character 
+    # when comparing suffixes
+    def are_case_sensitive_equal(s1, s2):
+        # Check if strings are identical case-sensitively
+        return s1 == s2
+    
+    # Verify exact case-sensitive suffix
     first = strings[0]
     for length in range(len(first), 0, -1):
-        # Candidate suffix from first string
         candidate = first[-length:]
         
-        # Check if suffix matches CASE-SENSITIVELY for ALL strings
-        if all(
-            s.endswith(candidate) and  # ends with suffix (allows different lengths)
-            s[-length:] == candidate   # matches EXACT case
-            for s in strings
-        ):
-            return candidate
+        # Check if ALL strings end with this exact suffix
+        try:
+            if all(
+                suffix_match := s[-length:] for s in strings
+            ) and len(set(strings[i][-length:] for i in range(len(strings)))) == 1:
+                return candidate
+        except IndexError:
+            # Occurs if any string is shorter than the current length
+            continue
     
     # No common suffix found
     return ""
