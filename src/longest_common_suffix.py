@@ -31,6 +31,15 @@ def find_longest_common_suffix(strings):
     if len(strings) == 1:
         return strings[0]
     
+    # Check if ALL strings have the same case in each character
+    first_string = strings[0]
+    if not all(
+        first_string[i].isupper() == s[i].isupper() 
+        for s in strings[1:] 
+        for i in range(min(len(first_string), len(s)))
+    ):
+        return ""
+    
     # Find the shortest string to limit suffix length
     shortest = min(strings, key=len)
     
