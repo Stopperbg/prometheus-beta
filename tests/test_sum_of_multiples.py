@@ -3,11 +3,15 @@ from src.sum_of_multiples import sum_of_multiples
 
 def test_sum_of_multiples_basic_range():
     """Test basic range with multiples of 2 and 3"""
-    assert sum_of_multiples(1, 10) == 33  # 2 + 3 + 4 + 6 + 8 + 9 + 10
+    result = sum_of_multiples(1, 10)
+    print(f"Basic range result: {result}")
+    assert result == 33  # 2 + 3 + 4 + 6 + 8 + 9 + 10
 
 def test_sum_of_multiples_zero_range():
     """Test range starting at zero"""
-    assert sum_of_multiples(0, 10) == 33
+    result = sum_of_multiples(0, 10)
+    print(f"Zero range result: {result}")
+    assert result == 33
 
 def test_sum_of_multiples_single_number():
     """Test range with a single number"""
@@ -16,7 +20,9 @@ def test_sum_of_multiples_single_number():
 
 def test_sum_of_multiples_large_range():
     """Test a larger range"""
-    assert sum_of_multiples(1, 100) == 2418
+    result = sum_of_multiples(1, 100)
+    print(f"Large range result: {result}")
+    assert result == 2418
 
 def test_sum_of_multiples_invalid_range():
     """Test invalid range where min > max"""
@@ -25,5 +31,7 @@ def test_sum_of_multiples_invalid_range():
 
 def test_sum_of_multiples_edge_cases():
     """Test edge cases"""
-    assert sum_of_multiples(-10, 10) == 33
+    result = sum_of_multiples(-10, 10)
+    print(f"Edge case result: {result}")
+    assert result == 33
     assert sum_of_multiples(-20, -10) == -30
