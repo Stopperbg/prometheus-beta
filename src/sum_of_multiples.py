@@ -16,6 +16,15 @@ def sum_of_multiples(min_val: int, max_val: int) -> int:
     if min_val > max_val:
         raise ValueError("Minimum value must be less than or equal to maximum value")
     
-    # Find and sum multiples of 2 and 3
-    return sum(num for num in range(min_val, max_val + 1) 
-               if num % 2 == 0 or num % 3 == 0)
+    # Use a set to avoid duplicate counting
+    multiples = set()
+    
+    # Find and add multiples of 2
+    multiples.update(range(min_val if min_val % 2 == 0 else min_val + 1, 
+                           max_val + 1, 2))
+    
+    # Find and add multiples of 3
+    multiples.update(range(min_val if min_val % 3 == 0 else min_val + (3 - min_val % 3), 
+                           max_val + 1, 3))
+    
+    return sum(multiples)
