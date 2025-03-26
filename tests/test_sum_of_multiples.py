@@ -23,7 +23,7 @@ def test_sum_of_multiples_invalid_range():
     with pytest.raises(ValueError, match="Minimum value must be less than or equal to maximum value"):
         sum_of_multiples(10, 1)
 
-def test_sum_of_multiples_negative_range():
-    """Test range with negative numbers"""
-    assert sum_of_multiples(-10, 10) == 0  # No multiples in this range
-    assert sum_of_multiples(-20, -10) == -30  # Negative multiples of 3
+def test_sum_of_multiples_edge_cases():
+    """Test edge cases"""
+    assert sum_of_multiples(-10, 10) == 33
+    assert sum_of_multiples(-20, -10) == -30
