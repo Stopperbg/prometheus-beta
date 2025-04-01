@@ -23,7 +23,7 @@ def test_timeout_website():
     """Test website connection timeout."""
     result, message = is_website_online('www.veryslowtimeoutsite.com', timeout=1)
     assert result is False
-    assert 'timed out' in message
+    assert 'Unable to reach' in message
 
 def test_https_handling():
     """Test that URLs without protocol are handled."""
