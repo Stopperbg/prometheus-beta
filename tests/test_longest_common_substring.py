@@ -31,8 +31,11 @@ def test_substring_at_different_positions():
 
 def test_multiple_possible_substrings():
     """Test when multiple common substrings exist"""
+    # Test case where multiple substrings are the same length
     result = find_longest_common_substring("abcabc", "bcabca")
-    assert result in ["bcab", "abca"]  # Allow either valid result
+    # Verify the length and that it appears in the input strings
+    assert len(result) == 4
+    assert result in ["bcab", "abca"]
 
 def test_long_strings():
     """Test with longer input strings"""
