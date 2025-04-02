@@ -25,6 +25,10 @@ def find_longest_common_substring(str1: str, str2: str) -> str:
     if not str1 or not str2:
         return ""
     
+    # Case-sensitive comparison
+    def is_case_sensitive_match(a, b):
+        return a == b
+    
     # Create a matrix to store lengths of common substrings
     m, n = len(str1), len(str2)
     # Initialize the dynamic programming matrix
@@ -32,21 +36,19 @@ def find_longest_common_substring(str1: str, str2: str) -> str:
     
     # Variables to track the longest substring
     max_length = 0
-    candidate_substrings = []
+    first_occurrence = None
     
     # Fill the dynamic programming matrix
     for i in range(1, m + 1):
         for j in range(1, n + 1):
-            # Case-sensitive matching
-            if str1[i-1] == str2[j-1]:
+            # Strict case-sensitive matching
+            if is_case_sensitive_match(str1[i-1], str2[j-1]):
                 dp[i][j] = dp[i-1][j-1] + 1
                 
-                # Track maximum length substrings
+                # Track the first occurrence of the longest substring
                 if dp[i][j] > max_length:
                     max_length = dp[i][j]
-                    candidate_substrings = [str1[i-max_length:i]]
-                elif dp[i][j] == max_length:
-                    candidate_substrings.append(str1[i-max_length:i])
+                    first_occurrence = i - 1
     
-    # Return the first candidate substring if found
-    return candidate_substrings[0] if candidate_substrings else ""
+    # Return the first occurrence of the longest substring
+    return str1[first_occurrence - max_length + 1 : first_occurrence + 1] if first_occurrence is not None else ""
