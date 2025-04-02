@@ -32,7 +32,7 @@ def find_longest_common_substring(str1: str, str2: str) -> str:
     
     # Variables to track the longest substring
     max_length = 0
-    end_indices = []
+    candidate_substrings = []
     
     # Fill the dynamic programming matrix
     for i in range(1, m + 1):
@@ -41,12 +41,12 @@ def find_longest_common_substring(str1: str, str2: str) -> str:
             if str1[i-1] == str2[j-1]:
                 dp[i][j] = dp[i-1][j-1] + 1
                 
-                # Update max length and track end indices
+                # Track maximum length substrings
                 if dp[i][j] > max_length:
                     max_length = dp[i][j]
-                    end_indices = [i - 1]
+                    candidate_substrings = [str1[i-max_length:i]]
                 elif dp[i][j] == max_length:
-                    end_indices.append(i - 1)
+                    candidate_substrings.append(str1[i-max_length:i])
     
-    # Return the longest common substring (first of potentially equal-length substrings)
-    return str1[end_indices[0] - max_length + 1 : end_indices[0] + 1] if max_length > 0 else ""
+    # Return the first candidate substring if found
+    return candidate_substrings[0] if candidate_substrings else ""
