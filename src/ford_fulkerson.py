@@ -25,16 +25,24 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
     # Create a residual graph
     def create_residual_graph(graph):
         residual = {}
-        for node in graph:
+        # Ensure all nodes are in the residual graph
+        all_nodes = set(graph.keys()).union(
+            set(node for subdict in graph.values() for node in subdict)
+        )
+        
+        # Initialize residual graph with all nodes
+        for node in all_nodes:
             residual[node] = {}
+        
+        # Add forward and backward edges
+        for node in graph:
             for neighbor, capacity in graph[node].items():
                 # Forward edge
                 residual[node][neighbor] = capacity
-                # Backward edge (if not exists)
-                if neighbor not in residual:
-                    residual[neighbor] = {}
+                # Ensure backward edge exists
                 if node not in residual[neighbor]:
                     residual[neighbor][node] = 0
+        
         return residual
     
     # Breadth-first search to find augmenting path
@@ -92,6 +100,11 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
         while current != source:
             prev = parent[current]
             residual[prev][current] -= path_flow
+            # Explicitly handle potential new paths
+            if current not in residual:
+                residual[current] = {}
+            if prev not in residual[current]:
+                residual[current][prev] = 0
             residual[current][prev] += path_flow
             current = prev
         
