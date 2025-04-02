@@ -37,11 +37,17 @@ def compress_data(data: Union[str, bytes],
 
     # Create Zstandard compressor
     if dictionary:
-        cctx = zstd.ZstdCompressionContext()
-        cctx.load_dictionary(dictionary)
-        return cctx.compress(data, compression_level)
+        # Create a compressor with a dictionary
+        cdict = zstd.ZstdCompressionDict(dictionary)
+        compressor = zstd.ZstdCompressor(
+            compression_level=compression_level, 
+            dict_data=cdict
+        )
+        return compressor.compress(data)
     else:
-        return zstd.compress(data, compression_level)
+        # Simple compression without a dictionary
+        compressor = zstd.ZstdCompressor(compression_level=compression_level)
+        return compressor.compress(data)
 
 
 def decompress_data(compressed_data: bytes, 
@@ -67,8 +73,11 @@ def decompress_data(compressed_data: bytes,
 
     # Create Zstandard decompressor
     if dictionary:
-        dctx = zstd.ZstdDecompressionContext()
-        dctx.load_dictionary(dictionary)
-        return dctx.decompress(compressed_data)
+        # Create a decompressor with a dictionary
+        ddict = zstd.ZstdCompressionDict(dictionary)
+        decompressor = zstd.ZstdDecompressor(dict_data=ddict)
+        return decompressor.decompress(compressed_data)
     else:
-        return zstd.decompress(compressed_data)
+        # Simple decompression without a dictionary
+        decompressor = zstd.ZstdDecompressor()
+        return decompressor.decompress(compressed_data)
