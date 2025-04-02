@@ -3,7 +3,8 @@ def bitonic_sort(arr, ascending=True):
     Implement the bitonic sort algorithm.
     
     Bitonic sort is a comparison-based sorting algorithm that can sort sequences 
-    in either ascending or descending order.
+    in either ascending or descending order by recursively splitting the sequence 
+    into bitonic sequences and merging them.
     
     Args:
         arr (list): The input list to be sorted
@@ -16,9 +17,9 @@ def bitonic_sort(arr, ascending=True):
     Raises:
         TypeError: If input is not a list
     """
-    # Special case: empty list
-    if not arr:
-        return []
+    # Special case: empty list or single element list
+    if not arr or len(arr) <= 1:
+        return arr.copy()
     
     # Validate input
     if not isinstance(arr, list):
@@ -27,44 +28,50 @@ def bitonic_sort(arr, ascending=True):
     # Create a copy to avoid modifying the original list
     arr = arr.copy()
     
-    # If the list is small, use built-in sorting
-    if len(arr) <= 1:
-        return arr
+    def bitonic_merge(start, size, direction):
+        """
+        Merge a bitonic sequence
+        
+        Args:
+            start (int): Starting index
+            size (int): Number of elements to merge
+            direction (bool): Sort direction 
+        """
+        if size > 1:
+            k = size // 2
+            
+            # Compare and swap elements
+            for i in range(start, start + k):
+                if (direction and arr[i] > arr[i + k]) or \
+                   (not direction and arr[i] < arr[i + k]):
+                    arr[i], arr[i + k] = arr[i + k], arr[i]
+            
+            # Recursively merge subarrays
+            bitonic_merge(start, k, direction)
+            bitonic_merge(start + k, k, direction)
     
-    # Split the list into two halves
-    mid = len(arr) // 2
-    left_half = arr[:mid]
-    right_half = arr[mid:]
+    def bitonic_sort_recursive(start, size, direction):
+        """
+        Recursively sort a sequence to create a bitonic sequence
+        
+        Args:
+            start (int): Starting index
+            size (int): Number of elements to sort
+            direction (bool): Final sort direction
+        """
+        if size > 1:
+            mid = size // 2
+            
+            # Sort first half ascending 
+            bitonic_sort_recursive(start, mid, True)
+            
+            # Sort second half descending
+            bitonic_sort_recursive(start + mid, size - mid, False)
+            
+            # Merge the entire sequence
+            bitonic_merge(start, size, direction)
     
-    # Recursively sort each half 
-    # First half ascending, second half descending
-    left_half.sort()
-    right_half.sort(reverse=True)
+    # Start the recursive sorting process
+    bitonic_sort_recursive(0, len(arr), ascending)
     
-    # Merge the sorted halves
-    result = []
-    left_index = right_index = 0
-    
-    while left_index < len(left_half) and right_index < len(right_half):
-        if ascending:
-            # Ascending sort: pick the smaller element
-            if left_half[left_index] <= right_half[right_index]:
-                result.append(left_half[left_index])
-                left_index += 1
-            else:
-                result.append(right_half[right_index])
-                right_index += 1
-        else:
-            # Descending sort: pick the larger element
-            if left_half[left_index] >= right_half[right_index]:
-                result.append(left_half[left_index])
-                left_index += 1
-            else:
-                result.append(right_half[right_index])
-                right_index += 1
-    
-    # Add remaining elements
-    result.extend(left_half[left_index:])
-    result.extend(right_half[right_index:])
-    
-    return result
+    return arr
