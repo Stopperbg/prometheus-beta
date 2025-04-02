@@ -3,8 +3,7 @@ def bitonic_sort(arr, ascending=True):
     Implement the bitonic sort algorithm.
     
     Bitonic sort is a comparison-based sorting algorithm that can sort sequences 
-    in either ascending or descending order by recursively splitting the sequence 
-    into bitonic sequences and merging them.
+    in either ascending or descending order by recursive bitonic splitting and merging.
     
     Args:
         arr (list): The input list to be sorted
@@ -16,7 +15,6 @@ def bitonic_sort(arr, ascending=True):
     
     Raises:
         TypeError: If input is not a list
-        ValueError: If list contains non-comparable elements
     """
     # Validate input
     if not isinstance(arr, list):
@@ -24,32 +22,6 @@ def bitonic_sort(arr, ascending=True):
     
     # Create a copy to avoid modifying the original list
     arr = arr.copy()
-    
-    def bitonic_sort_recursive(arr, low, count, direction):
-        """
-        Recursively sort a bitonic sequence
-        
-        Args:
-            arr (list): The list to sort
-            low (int): Starting index
-            count (int): Number of elements to sort
-            direction (bool): Sort direction
-        """
-        # Base case: if count is 1 or less, it's already sorted
-        if count <= 1:
-            return
-        
-        # Determine the middle point 
-        mid = count // 2
-        
-        # Sort first half ascending
-        bitonic_sort_recursive(arr, low, mid, True)
-        
-        # Sort second half descending 
-        bitonic_sort_recursive(arr, low + mid, count - mid, False)
-        
-        # Merge the two halves
-        bitonic_merge(arr, low, count, direction)
     
     def bitonic_merge(arr, low, count, direction):
         """
@@ -61,50 +33,64 @@ def bitonic_sort(arr, ascending=True):
             count (int): Number of elements to merge
             direction (bool): Sort direction (True for ascending, False for descending)
         """
-        # Base case
         if count <= 1:
             return
         
-        # Find the greatest power of 2 less than or equal to count
-        k = largest_power_of_two(count)
+        # Compute the distance between elements to compare
+        distance = count // 2
         
-        # Perform comparison and swap
-        for i in range(low, low + count - k):
-            compare_and_swap(arr, i, i + k, direction)
+        # Compare and swap if needed
+        for i in range(low, low + count - distance):
+            if (direction and arr[i] > arr[i + distance]) or \
+               (not direction and arr[i] < arr[i + distance]):
+                arr[i], arr[i + distance] = arr[i + distance], arr[i]
         
-        # Recursively merge the two halves
-        bitonic_merge(arr, low, k, direction)
-        bitonic_merge(arr, low + k, count - k, direction)
+        # Recursively merge subarrays
+        if distance > 1:
+            bitonic_merge(arr, low, distance, direction)
+            bitonic_merge(arr, low + distance, distance, direction)
     
-    def compare_and_swap(arr, i, j, direction):
+    def convert_to_bitonic(arr, ascending):
         """
-        Compare and potentially swap elements based on the direction
+        Convert input list to a bitonic sequence
+        
+        A bitonic sequence is a sequence that monotonically increases, then 
+        monotonically decreases.
         
         Args:
-            arr (list): The list to modify
-            i (int): Index of first element
-            j (int): Index of second element
-            direction (bool): True for ascending, False for descending
+            arr (list): Input list
+            ascending (bool): Desired sorting direction
         """
-        if (direction and arr[i] > arr[j]) or (not direction and arr[i] < arr[j]):
-            arr[i], arr[j] = arr[j], arr[i]
-    
-    def largest_power_of_two(n):
-        """
-        Find the largest power of 2 less than or equal to n
+        # Determine sequence length (power of 2)
+        n = 1
+        while n < len(arr):
+            n *= 2
         
-        Args:
-            n (int): Input number
+        # Pad with maximum values if needed
+        while len(arr) < n:
+            arr.append(float('inf') if ascending else float('-inf'))
         
-        Returns:
-            int: Largest power of 2 less than or equal to n
-        """
-        power = 1
-        while power * 2 <= n:
-            power *= 2
-        return power
+        # Split list into half
+        half_size = n // 2
+        
+        # Sort first half in ascending order
+        for i in range(half_size):
+            for j in range(i):
+                if (ascending and arr[i] < arr[j]) or \
+                   (not ascending and arr[i] > arr[j]):
+                    arr[i], arr[j] = arr[j], arr[i]
+        
+        # Sort second half in descending order
+        for i in range(half_size, n):
+            for j in range(half_size, i):
+                if (ascending and arr[i] > arr[j]) or \
+                   (not ascending and arr[i] < arr[j]):
+                    arr[i], arr[j] = arr[j], arr[i]
+        
+        return arr[:len(arr) - (n - len(arr))]
     
-    # Start the recursive sorting process
-    bitonic_sort_recursive(arr, 0, len(arr), ascending)
+    # Convert to bitonic sequence and merge
+    arr = convert_to_bitonic(arr, ascending)
+    bitonic_merge(arr, 0, len(arr), ascending)
     
     return arr
