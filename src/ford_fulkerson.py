@@ -22,7 +22,7 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
     if source not in graph or sink not in graph:
         raise ValueError("Source or sink node not in graph")
     
-    # Create a residual graph
+    # Create a deep copy of the graph to create a residual graph
     def create_residual_graph(graph):
         residual = {}
         # Ensure all nodes are in the residual graph
@@ -45,29 +45,24 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
         
         return residual
     
-    # Breadth-first search to find augmenting path
-    def bfs(residual, source, sink):
-        # Track visited nodes and parent nodes
-        visited = {node: False for node in residual}
-        parent = {node: None for node in residual}
+    # Depth-first search to find augmenting path
+    def dfs(residual, source, sink, path, visited):
+        # Mark source as visited
+        visited.add(source)
         
-        # Queue for BFS
-        queue = deque([source])
-        visited[source] = True
+        # If we've reached the sink, return the path
+        if source == sink:
+            return path
         
-        while queue:
-            current = queue.popleft()
-            
-            # Check neighbors
-            for neighbor, capacity in residual[current].items():
-                if not visited[neighbor] and capacity > 0:
-                    queue.append(neighbor)
-                    visited[neighbor] = True
-                    parent[neighbor] = current
-                    
-                    # Found path to sink
-                    if neighbor == sink:
-                        return parent
+        # Explore all neighboring nodes
+        for neighbor, capacity in residual[source].items():
+            if neighbor not in visited and capacity > 0:
+                # Try to extend the path
+                new_path = dfs(residual, neighbor, sink, path + [(source, neighbor)], visited)
+                
+                # If a path is found, return it
+                if new_path:
+                    return new_path
         
         # No path found
         return None
@@ -80,33 +75,28 @@ def ford_fulkerson(graph: Dict[str, Dict[str, int]], source: str, sink: str) -> 
     
     # Find augmenting paths
     while True:
-        # Find path using BFS
-        parent = bfs(residual, source, sink)
+        # Find path using DFS
+        visited = set()
+        path = dfs(residual, source, sink, [], visited)
         
         # No more augmenting paths
-        if parent is None:
+        if not path:
             break
         
         # Find minimum flow along the path
-        path_flow = float('inf')
-        current = sink
-        while current != source:
-            prev = parent[current]
-            path_flow = min(path_flow, residual[prev][current])
-            current = prev
+        path_flow = min(residual[u][v] for u, v in path)
         
         # Update residual graph
-        current = sink
-        while current != source:
-            prev = parent[current]
-            residual[prev][current] -= path_flow
-            # Explicitly handle potential new paths
-            if current not in residual:
-                residual[current] = {}
-            if prev not in residual[current]:
-                residual[current][prev] = 0
-            residual[current][prev] += path_flow
-            current = prev
+        for u, v in path:
+            # Reduce forward edge capacity
+            residual[u][v] -= path_flow
+            
+            # Ensure backward edge exists
+            if v not in residual[u]:
+                residual[u][v] = 0
+            
+            # Increase backward edge capacity
+            residual[v][u] += path_flow
         
         # Add to max flow
         max_flow += path_flow
