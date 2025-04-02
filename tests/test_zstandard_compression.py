@@ -1,4 +1,10 @@
+import os
+import sys
 import pytest
+
+# Add the project root directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import zstandard as zstd
 from src.zstandard_compression import compress_data, decompress_data
 
