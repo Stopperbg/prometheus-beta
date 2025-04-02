@@ -37,12 +37,13 @@ def find_longest_common_substring(str1: str, str2: str) -> str:
     # Fill the dynamic programming matrix
     for i in range(1, m + 1):
         for j in range(1, n + 1):
-            # If characters match, extend the previous substring
+            # Case-sensitive matching
             if str1[i-1] == str2[j-1]:
                 dp[i][j] = dp[i-1][j-1] + 1
                 
                 # Update max length and end index if needed
-                if dp[i][j] > max_length:
+                # Prioritize the first occurrence in case of multiple equal-length substrings
+                if dp[i][j] > max_length or (dp[i][j] == max_length and i - dp[i][j] < end_index - max_length):
                     max_length = dp[i][j]
                     end_index = i - 1
     
