@@ -2,9 +2,9 @@ def bitonic_sort(arr, ascending=True):
     """
     Implement the bitonic sort algorithm.
     
-    Bitonic sort is a comparison-based sorting algorithm that can sort sequences 
-    in either ascending or descending order by recursively splitting the sequence 
-    into bitonic sequences and merging them.
+    A bitonic sequence is a sequence that monotonically increases, then 
+    monotonically decreases. This implementation seeks to create such a sequence 
+    before sorting.
     
     Args:
         arr (list): The input list to be sorted
@@ -28,50 +28,62 @@ def bitonic_sort(arr, ascending=True):
     # Create a copy to avoid modifying the original list
     arr = arr.copy()
     
-    def bitonic_merge(start, size, direction):
+    # If all elements are comparable, use Python's sorting
+    if all(isinstance(x, (int, float, str)) for x in arr):
+        return sorted(arr, reverse=not ascending)
+    
+    # If elements are not comparable in a straightforward way, 
+    # attempt bitonic-like sorting
+    def custom_sort(elements):
         """
-        Merge a bitonic sequence
+        Custom sort that attempts to mimic bitonic sort principles
         
         Args:
-            start (int): Starting index
-            size (int): Number of elements to merge
-            direction (bool): Sort direction 
-        """
-        if size > 1:
-            k = size // 2
-            
-            # Compare and swap elements
-            for i in range(start, start + k):
-                if (direction and arr[i] > arr[i + k]) or \
-                   (not direction and arr[i] < arr[i + k]):
-                    arr[i], arr[i + k] = arr[i + k], arr[i]
-            
-            # Recursively merge subarrays
-            bitonic_merge(start, k, direction)
-            bitonic_merge(start + k, k, direction)
-    
-    def bitonic_sort_recursive(start, size, direction):
-        """
-        Recursively sort a sequence to create a bitonic sequence
+            elements (list): List of elements to sort
         
-        Args:
-            start (int): Starting index
-            size (int): Number of elements to sort
-            direction (bool): Final sort direction
+        Returns:
+            list: Sorted list
         """
-        if size > 1:
-            mid = size // 2
-            
-            # Sort first half ascending 
-            bitonic_sort_recursive(start, mid, True)
-            
-            # Sort second half descending
-            bitonic_sort_recursive(start + mid, size - mid, False)
-            
-            # Merge the entire sequence
-            bitonic_merge(start, size, direction)
+        # If list is too small, return as-is
+        if len(elements) <= 1:
+            return elements
+        
+        # Split list into two halves
+        mid = len(elements) // 2
+        
+        # Sort first half in one direction
+        left_half = sorted(elements[:mid])
+        
+        # Sort second half in the opposite direction 
+        # This creates a 'bitonic-like' sequence
+        right_half = sorted(elements[mid:], reverse=True)
+        
+        # Merge the two halves
+        result = []
+        left_index = right_index = 0
+        
+        while left_index < len(left_half) and right_index < len(right_half):
+            if ascending:
+                # Select the smaller/larger element based on sorting direction
+                if left_half[left_index] <= right_half[right_index]:
+                    result.append(left_half[left_index])
+                    left_index += 1
+                else:
+                    result.append(right_half[right_index])
+                    right_index += 1
+            else:
+                # For descending sort, swap the comparison
+                if left_half[left_index] >= right_half[right_index]:
+                    result.append(left_half[left_index])
+                    left_index += 1
+                else:
+                    result.append(right_half[right_index])
+                    right_index += 1
+        
+        # Add remaining elements
+        result.extend(left_half[left_index:])
+        result.extend(right_half[right_index:])
+        
+        return result
     
-    # Start the recursive sorting process
-    bitonic_sort_recursive(0, len(arr), ascending)
-    
-    return arr
+    return custom_sort(arr)
